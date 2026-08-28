@@ -1,0 +1,24 @@
+{
+  "name": "engineering",
+  "version": "1.0.0",
+  "description": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "engineering",
+    "planning",
+    "testing",
+    "review"
+  ],
+  "interface": {
+    "displayName": "engineering",
+    "shortDescription": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
+    "longDescription": "提供编写计划、TDD 实现、根因诊断、独立代码审查和动态验证等工程开发能力。",
+    "developerName": "Skills Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "根据当前工程任务选择并使用合适的工程技能。"
+  }
+}

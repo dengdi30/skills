@@ -1,0 +1,36 @@
+{
+  "name": "skills",
+  "owner": {
+    "name": "Skills Maintainers"
+  },
+  "metadata": {
+    "description": "面向工程开发与设计工作的 Agent Skills。"
+  },
+  "plugins": [
+    {
+      "name": "engineering",
+      "source": "./plugins/engineering",
+      "description": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
+      "version": "1.0.0",
+      "category": "Developer Tools",
+      "tags": [
+        "engineering",
+        "planning",
+        "testing",
+        "review"
+      ]
+    },
+    {
+      "name": "baoyu-design",
+      "source": "./plugins/baoyu-design",
+      "description": "面向 UI、原型、文档和演示文稿的设计技能。",
+      "version": "1.0.0",
+      "category": "Design",
+      "tags": [
+        "design",
+        "prototype",
+        "slides"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "engineering",
+  "version": "1.0.0",
+  "description": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/"
+}

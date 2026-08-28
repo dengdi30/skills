@@ -1,0 +1,341 @@
+---
+name: finishing-a-development-branch
+description: "Use when implementation is complete and all tasks have passed review — verifies tests, applies spec delta + archives docs/changes, presents structured integration options (PR/merge/keep/discard), and cleans up workspace. Required after subagent-driven-development skill. Not for use when tests fail or review has open issues."
+---
+
+# Finishing a Development Branch
+
+实现完成后的收尾工作流。验证质量 → 清理产物 → 呈现集成选项 → 执行并清理工作区。
+
+**核心原则：** 验证测试 → 清理产物 → 环境检测 → 呈现选项 → 执行 → 工作区清理
+
+**启动时公告：** "使用 finishing-a-development-branch skill 完成收尾工作。"
+
+---
+
+## Step 1：预条件验证
+
+**在呈现选项前，验证实现质量：**
+
+```bash
+# 运行项目测试套件
+npm test / pytest / go test ./... / cargo test
+```
+
+**检查清单：**
+
+- [ ] 测试覆盖率 >= 80%
+- [ ] 无残留调试产物（console.log、debugger、print 语句）
+- [ ] Phase 3 全局审查已 APPROVE
+- [ ] 每个任务的 commit 符合 Conventional Commits
+
+**测试失败：**
+
+```
+测试失败（N 个失败）。必须修复后才能继续：
+
+[展示失败信息]
+
+无法继续直到测试通过。
+```
+
+**停。不进入 Step 2。**
+
+**测试通过** → 继续 Step 1.5。
+
+---
+
+## Step 1.5：上下文收集（为 doc-sync 准备）
+
+确定以下信息，传给 Step 2b 的 doc-sync 调用：
+
+- **feature**：feature 名称。来源：
+  - SDD 流程 → 从 SDD Phase 1 读取的 `changes/<feature>/` 文件夹名提取
+  - investigate 流程 → 从 Phase 3 调查报告中的修复方向提取模块名
+  - 无法确定 → 询问用户
+- **base_SHA**：`git merge-base HEAD <base-branch>` 或 SDD 记录的 first base SHA
+- **changed_files**：`git diff --name-only <base_SHA>..HEAD`
+- **context**：
+  - 来源于 SDD（subagent-driven-development Phase 4 调用 finishing）→ `new-feature`
+  - 来源于 investigate（Phase 5 调用 finishing）→ `bug-fix`
+  - 无法确定 → `new-feature`
+- **linked_issues**：本次工作解决的 GitHub issue 编号列表。来源：
+  - resolve 流程调用 → 由其传入
+  - 用户主动提供 → 记录
+  - 无关联 issue → 空（选项 1 PR body 不加 Closes 段）
+
+---
+
+## Step 2：文档与产物清理
+
+### 2a. Doc Sync（apply delta + verify）
+
+调用 `/doc-sync` skill，传入 Step 1.5 收集的 feature、base_SHA、changed_files、context。
+
+doc-sync 把 `changes/<feature>/specs.md` delta **apply** 到 `docs/specs/`、catalog 状态推进、design artifact 状态更新、fresh-eyes verify。
+
+doc-sync 不自行 commit；其产出由 Step 2c 统一提交。**必须先于 2b 归档**（归档会移动 specs.md）。
+
+### 2b. Change 文件夹归档
+
+doc-sync apply 完 delta 后，归档 change 文件夹：
+
+```bash
+# 删实现产物（短命，代码是真相）
+rm docs/changes/<feature>/design.md docs/changes/<feature>/tasks.md
+# 留意图 + delta（耐久），移到 archive
+mkdir -p docs/changes/archive
+git mv docs/changes/<feature> docs/changes/archive/<feature>
+```
+
+- 删 `design.md` + `tasks.md`（实现方案，finishing 后以代码为真相）
+- 留 `proposal.md` + `specs.md`（意图 + 行为 delta），移到 `docs/changes/archive/<feature>/` 作演化日志
+
+bug-fix Case A（无 change 文件夹）→ 跳过本步。
+
+### 2c. Doc Commit
+
+将 Step 2a 的计划文件清理与 Step 2b 的 doc-sync 产物打包成独立 docs commit：
+
+```bash
+git status --porcelain docs/
+```
+
+**有变更 → 提交：**
+
+```bash
+git add docs/
+git commit -m "docs(<feature>): <message>"
+```
+
+message 由 Step 1.5 的 context 决定：
+
+| context | message |
+|---------|---------|
+| `new-feature` | `sync docs with implementation` |
+| `bug-fix` | `sync catalog after fix` |
+| `abandoned` | `mark <feature> as abandoned` |
+
+commit 仅含 `docs/` 下的 `.md` 文件。
+
+**无变更 → 跳过此步**（doc-sync 判定完全对齐 + Step 2a 无计划文件时合法）。
+
+### 2d. Commit 验证
+
+```bash
+# 查看当前分支的 commit history
+git log --oneline <base-branch>..HEAD
+```
+
+逐条检查 commit 是否符合 Conventional Commits（SDD Step 4 与 Step 2c 提交时已遵守）。
+
+**不符合时：** 报告问题 commit 列表给用户，由用户决定如何处理（手动 squash、保持原样等）。finishing skill 不重写 commit history。
+
+调用 commit-quality skill 验证最终 commit 质量。
+
+---
+
+## Step 3：环境检测
+
+**确定工作区状态，决定清理策略：**
+
+```bash
+GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
+GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
+```
+
+| 状态 | 含义 | 清理策略 |
+|------|------|---------|
+| `GIT_DIR == GIT_COMMON` | 普通仓库，非 worktree | 无 worktree 需清理 |
+| `GIT_DIR != GIT_COMMON`，命名分支 | worktree 开发环境 | 按选项决定是否清理（Step 5） |
+| `GIT_DIR != GIT_COMMON`，detached HEAD | 外部管理的 worktree | 不主动清理 |
+
+### 确定基线分支
+
+```bash
+git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
+```
+
+或询问用户："这个分支从 main 分出来的，对吗？"
+
+---
+
+## Step 4：呈现选项
+
+**普通仓库和命名分支 worktree — 4 个选项：**
+
+```
+实现完成。接下来：
+
+1. Push 并创建 Pull Request
+2. 本地合并回 <base-branch>
+3. 保持分支原样（稍后自己处理）
+4. 丢弃这个工作
+
+选择？
+```
+
+**Detached HEAD（外部管理 workspace）— 3 个选项：**
+
+```
+实现完成。当前在 detached HEAD（外部管理的 workspace）。
+
+1. Push 为新分支并创建 Pull Request
+2. 保持原样（稍后自己处理）
+3. 丢弃这个工作
+
+选择？
+```
+
+不附加解释，保持选项简洁。
+
+---
+
+## Step 5：执行选择
+
+### 选项 1：Push 并创建 PR
+
+```bash
+# 推送分支
+git push -u origin <feature-branch>
+
+# 创建 PR
+gh pr create --title "<title>" --body "$(cat <<'EOF'
+## Summary
+<2-3 bullets>
+
+## Test plan
+- [ ] <verification steps>
+
+<若 Step 1.5 linked_issues 非空，每个 issue 一行 Closes #N；为空则省略本段>
+EOF
+)"
+```
+
+`Closes #N`（每个关联 issue 一行）使 PR merge 后对应 issue 自动关闭。linked_issues 为空时不加此段。
+
+**不清理 worktree。** 用户可能需要迭代 PR 反馈。
+
+### 选项 2：本地合并
+
+```bash
+# 切到主仓库
+MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
+cd "$MAIN_ROOT"
+
+# 合并
+git checkout <base-branch>
+git pull
+git merge <feature-branch>
+
+# 验证合并后测试通过
+<test command>
+```
+
+**合并成功后** → Step 6 清理 worktree → 删除分支：
+
+```bash
+git branch -d <feature-branch>
+```
+
+### 选项 3：保持原样
+
+报告：
+
+```
+保持分支 <name>。Worktree 位于 <path>。
+```
+
+**不清理 worktree。**
+
+### 选项 4：丢弃
+
+**先确认：**
+
+```
+这将永久删除：
+- 分支 <name>
+- 所有 commit：<commit-list>
+- Worktree 位于 <path>
+
+输入 'discard' 确认。
+```
+
+等待用户输入 "discard" 后执行。
+
+确认后 → Step 6 清理 worktree → 强制删除分支：
+
+```bash
+git branch -D <feature-branch>
+```
+
+---
+
+## Step 6：工作区清理
+
+**仅选项 2（合并）和选项 4（丢弃）触发。** 选项 1（PR）和选项 3（保持）始终保留 worktree。
+
+### 普通仓库（`GIT_DIR == GIT_COMMON`）
+
+无 worktree 需清理。完成。
+
+### Worktree
+
+```bash
+MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
+```
+
+**安全操作顺序（不可逆，必须严格按序）：**
+
+1. **先 `cd` 到主仓库根目录**（从 worktree 内部执行 `git worktree remove` 会失败）
+2. **移除 worktree**
+3. **修剪过期注册**
+4. **最后删除分支**（worktree 仍引用分支时 `git branch -d` 会失败）
+
+```bash
+cd "$MAIN_ROOT"
+git worktree remove "$WORKTREE_PATH"
+git worktree prune
+# 分支删除已在 Step 5 对应选项中执行
+```
+
+**溯源判断：** 只移除由 wyrd 流程创建的 worktree（路径在 `.trae/worktrees/` 下）。外部管理的 workspace 不主动清理。
+
+---
+
+## 快速参考
+
+| 选项 | 合并 | Push | 保留 Worktree | 清理分支 |
+|------|------|------|---------------|---------|
+| 1. PR | - | yes | yes | - |
+| 2. 合并 | yes | - | - | yes |
+| 3. 保持 | - | - | yes | - |
+| 4. 丢弃 | - | - | - | yes (force) |
+
+---
+
+## Red Flags
+
+**NEVER：**
+- 测试未通过时继续
+- 跳过 Step 2c 进入选项呈现（doc-sync 产物必须落盘成 commit）
+- 把 doc commit 与代码 commit 合并提交
+- 未呈现结构化选项就开放式询问"接下来做什么"
+- 未验证合并结果就删除分支
+- 未经确认丢弃工作
+- 未经请求 force-push
+- 合并成功前移除 worktree
+- 清理非 wyrd 创建的 worktree
+- 从 worktree 内部执行 `git worktree remove`
+- 选项 1/3 清理 worktree
+
+**ALWAYS：**
+- 选项前验证测试
+- 选项前检测环境
+- 呈现恰好 4 个选项（detached HEAD 为 3 个）
+- 选项 4 要求输入确认
+- 选项 2/4 才清理 worktree
+- `cd` 到主仓库后再 worktree remove
+- worktree remove 后执行 prune

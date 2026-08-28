@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "marketplace": {
+    "name": "skills",
+    "display_name": "Skills",
+    "owner": "Skills Maintainers"
+  },
+  "plugins": [
+    {
+      "id": "engineering",
+      "display_name": "engineering",
+      "description": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
+      "long_description": "提供编写计划、TDD 实现、根因诊断、独立代码审查和动态验证等工程开发能力。",
+      "version": "1.0.0",
+      "source_kind": "maintained",
+      "default_install": false,
+      "category": "Developer Tools",
+      "default_prompt": "根据当前工程任务选择并使用合适的工程技能。",
+      "tags": [
+        "engineering",
+        "planning",
+        "testing",
+        "review"
+      ],
+      "skills": [
+        "skills/engineering/write-plan",
+        "skills/engineering/tdd-implement",
+        "skills/engineering/root-cause",
+        "skills/engineering/review",
+        "skills/engineering/verify"
+      ]
+    },
+    {
+      "id": "baoyu-design",
+      "display_name": "Baoyu Design",
+      "description": "面向 UI、原型、文档和演示文稿的设计技能。",
+      "long_description": "用于创建 UI、交互原型、设计系统、文档、演示文稿和其他视觉设计产物。",
+      "version": "1.0.0",
+      "source_kind": "vendored",
+      "default_install": false,
+      "category": "Design",
+      "default_prompt": "使用 Baoyu Design 创建符合需求的设计产物。",
+      "tags": [
+        "design",
+        "prototype",
+        "slides"
+      ],
+      "license": "MIT",
+      "license_file": "third-party/licenses/baoyu-design-MIT.txt",
+      "provenance_file": "third-party/baoyu-design.upstream.json",
+      "skills": [
+        "third-party/baoyu-design"
+      ]
+    }
+  ]
+}

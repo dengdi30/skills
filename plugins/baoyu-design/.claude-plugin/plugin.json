@@ -1,0 +1,10 @@
+{
+  "name": "baoyu-design",
+  "version": "1.0.0",
+  "description": "面向 UI、原型、文档和演示文稿的设计技能。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "license": "MIT"
+}

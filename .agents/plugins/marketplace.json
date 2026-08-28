@@ -1,0 +1,32 @@
+{
+  "name": "skills",
+  "interface": {
+    "displayName": "Skills"
+  },
+  "plugins": [
+    {
+      "name": "engineering",
+      "source": {
+        "source": "local",
+        "path": "./plugins/engineering"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "baoyu-design",
+      "source": {
+        "source": "local",
+        "path": "./plugins/baoyu-design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Design"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "baoyu-design",
+  "version": "1.0.0",
+  "description": "面向 UI、原型、文档和演示文稿的设计技能。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "design",
+    "prototype",
+    "slides"
+  ],
+  "interface": {
+    "displayName": "Baoyu Design",
+    "shortDescription": "面向 UI、原型、文档和演示文稿的设计技能。",
+    "longDescription": "用于创建 UI、交互原型、设计系统、文档、演示文稿和其他视觉设计产物。",
+    "developerName": "Skills Maintainers",
+    "category": "Design",
+    "capabilities": [],
+    "defaultPrompt": "使用 Baoyu Design 创建符合需求的设计产物。"
+  },
+  "license": "MIT"
+}

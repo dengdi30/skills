@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/JimLiu/baoyu-design",
+  "path": "skills/baoyu-design",
+  "commit": "026d4ea012bdd5cada72ac8cc13f21ba4edf2245",
+  "license": "MIT",
+  "license_file": "third-party/licenses/baoyu-design-MIT.txt",
+  "imported_at": "2026-08-27",
+  "local_modifications": false
+}
