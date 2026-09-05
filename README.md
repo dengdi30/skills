@@ -21,7 +21,8 @@
 ├── distribution/catalog.json
 ├── plugins/                         # 生成的 Codex / Claude Code 插件
 │   ├── engineering/
-│   └── baoyu-design/
+│   ├── baoyu-design/
+│   └── handoff/
 ├── scripts/build_distribution.py
 ├── skills/
 │   ├── engineering/
@@ -34,6 +35,8 @@
 └── third-party/
     ├── baoyu-design/
     ├── baoyu-design.upstream.json
+    ├── handoff/
+    ├── handoff.upstream.json
     └── licenses/
 ```
 
@@ -53,7 +56,7 @@
 
 ### baoyu-design
 
-[baoyu-design](third-party/baoyu-design/SKILL.md) 用于从需求到 UI 设计的工作，包括页面视觉、设计系统约束、原型和实现交接。它可以读取团队提供的设计规范，并据此产出符合约束的设计方案。
+[baoyu-design](third-party/baoyu-design/SKILL.md) 由 Jim Liu（宝玉）维护，上游仓库为 [`JimLiu/baoyu-design`](https://github.com/JimLiu/baoyu-design)。该 skill 用于从需求到 UI 设计的工作，包括页面视觉、设计系统约束、原型和实现交接。它可以读取团队提供的设计规范，并据此产出符合约束的设计方案。
 
 仓库中的副本保持上游原样，引入版本固定为 commit `026d4ea012bdd5cada72ac8cc13f21ba4edf2245`：
 
@@ -62,16 +65,28 @@
 
 更新时应重新固定明确的上游 commit、核对目录内容，并同步来源与许可证记录。
 
+### handoff
+
+[handoff](third-party/handoff/SKILL.md) 由 Matt Pocock 维护，上游仓库为 [`mattpocock/skills`](https://github.com/mattpocock/skills)。该 skill 用于在切换会话或窗口前，将当前对话压缩成可供另一个 Agent 接续的交接文档。它会要求引用已有产物、移除敏感信息，并根据下一会话的目标调整交接内容。
+
+仓库中的副本保持上游原样，引入版本固定为 commit `3cca18b368ae95cdbdebbff572ccafa662551015`：
+
+- [来源与版本记录](third-party/handoff.upstream.json)
+- [MIT 许可证](third-party/licenses/handoff-MIT.txt)
+
+更新时应重新固定明确的上游 commit、核对目录内容，并同步来源与许可证记录。
+
 ## Marketplace
 
-仓库提供两个彼此独立的插件：
+仓库提供三个彼此独立的插件：
 
 | Plugin | 内容 | 安装策略 |
 | --- | --- | --- |
 | `engineering` | `write-plan`、`tdd-implement`、`root-cause`、`review`、`verify` | Codex、Claude Code 均显式安装 |
 | `baoyu-design` | vendored 的 `baoyu-design` skill | 始终显式安装 |
+| `handoff` | vendored 的 `handoff` skill | 始终显式安装 |
 
-添加 marketplace 只注册可用插件，不会自动安装或启用 `engineering`、`baoyu-design`。
+添加 marketplace 只注册可用插件，不会自动安装或启用 `engineering`、`baoyu-design`、`handoff`。
 
 ### Codex
 
@@ -80,13 +95,14 @@ codex plugin marketplace add https://github.com/dengdi30/skills.git
 codex plugin add engineering@skills
 ```
 
-按需安装设计插件：
+按需安装第三方插件：
 
 ```sh
 codex plugin add baoyu-design@skills
+codex plugin add handoff@skills
 ```
 
-也可以在 Codex CLI 中运行 `/plugins`，或在 Codex app 的 Plugins 页面中打开 `Skills` marketplace，再手动安装 `engineering`。`baoyu-design` 保持可选。安装后新建会话，再通过 skill 选择器或任务描述使用对应能力。
+也可以在 Codex CLI 中运行 `/plugins`，或在 Codex app 的 Plugins 页面中打开 `Skills` marketplace，再手动安装 `engineering`。`baoyu-design` 和 `handoff` 保持可选。安装后新建会话，再通过 skill 选择器或任务描述使用对应能力。
 
 Codex IDE extension 当前不支持 plugins；需要在 IDE extension 中使用时，仍应把所需 skill 安装到项目的 `.agents/skills/`。
 
@@ -97,13 +113,14 @@ claude plugin marketplace add https://github.com/dengdi30/skills.git
 claude plugin install engineering@skills
 ```
 
-按需安装设计插件：
+按需安装第三方插件：
 
 ```sh
 claude plugin install baoyu-design@skills
+claude plugin install handoff@skills
 ```
 
-Claude Code 中的插件 skill 使用命名空间，例如 `/engineering:review` 和 `/baoyu-design:baoyu-design`。
+Claude Code 中的插件 skill 使用命名空间，例如 `/engineering:review`、`/baoyu-design:baoyu-design` 和 `/handoff:handoff`。
 
 ### TRAE 企业版
 
@@ -112,10 +129,11 @@ Claude Code 中的插件 skill 使用命名空间，例如 `/engineering:review`
 ```text
 engineering-1.0.0.zip
 baoyu-design-1.0.0.zip
+handoff-1.0.0.zip
 SHA256SUMS
 ```
 
-`engineering-1.0.0.zip` 是交付 bundle，需要先解压，再将其中五个独立 skill ZIP 分别上传到 TRAE 企业技能。`baoyu-design-1.0.0.zip` 可以直接上传，并包含许可证和固定上游版本记录。可使用 `SHA256SUMS` 校验下载文件的完整性。
+`engineering-1.0.0.zip` 是交付 bundle，需要先解压，再将其中五个独立 skill ZIP 分别上传到 TRAE 企业技能。`baoyu-design-1.0.0.zip` 和 `handoff-1.0.0.zip` 都可以直接上传，并包含各自的许可证和固定上游版本记录。可使用 `SHA256SUMS` 校验下载文件的完整性。
 
 不要发布或自动加载 `skills/deprecated/`。
 
@@ -126,6 +144,7 @@ SHA256SUMS
 - 复杂功能：先用 `write-plan` 明确范围，再按需要使用 `tdd-implement`、`review` 或 `verify`。
 - 未知故障：先用 `root-cause` 收集证据并定位原因，再由开发者决定如何实现和验证修复。
 - Web UI：先用 `baoyu-design` 形成设计产物，再选择合适的实现与验收方式。
+- 会话或窗口切换：使用 `handoff` 生成脱敏的交接文档，再在新会话中引用该文档继续工作。
 - 已有明确方案的小改动：可以直接使用 `tdd-implement`，无需为了形式补写计划。
 - 只需验收已有结果：可以单独使用 `verify`。
 

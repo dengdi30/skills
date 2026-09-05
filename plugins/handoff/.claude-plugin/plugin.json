@@ -1,0 +1,10 @@
+{
+  "name": "handoff",
+  "version": "1.0.0",
+  "description": "将当前对话压缩为可供另一个 Agent 接续的交接文档。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "license": "MIT"
+}

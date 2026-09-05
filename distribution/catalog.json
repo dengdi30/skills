@@ -51,6 +51,28 @@
       "skills": [
         "third-party/baoyu-design"
       ]
+    },
+    {
+      "id": "handoff",
+      "display_name": "Handoff",
+      "description": "将当前对话压缩为可供另一个 Agent 接续的交接文档。",
+      "long_description": "用于在切换会话或窗口前生成精简、脱敏并引用既有产物的交接文档。",
+      "version": "1.0.0",
+      "source_kind": "vendored",
+      "default_install": false,
+      "category": "Developer Tools",
+      "default_prompt": "将当前对话整理为下一会话可以直接接续的 handoff 文档。",
+      "tags": [
+        "handoff",
+        "context",
+        "productivity"
+      ],
+      "license": "MIT",
+      "license_file": "third-party/licenses/handoff-MIT.txt",
+      "provenance_file": "third-party/handoff.upstream.json",
+      "skills": [
+        "third-party/handoff"
+      ]
     }
   ]
 }

@@ -31,6 +31,18 @@
         "prototype",
         "slides"
       ]
+    },
+    {
+      "name": "handoff",
+      "source": "./plugins/handoff",
+      "description": "将当前对话压缩为可供另一个 Agent 接续的交接文档。",
+      "version": "1.0.0",
+      "category": "Developer Tools",
+      "tags": [
+        "handoff",
+        "context",
+        "productivity"
+      ]
     }
   ]
 }

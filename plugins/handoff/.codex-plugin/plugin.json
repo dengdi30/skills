@@ -1,0 +1,24 @@
+{
+  "name": "handoff",
+  "version": "1.0.0",
+  "description": "将当前对话压缩为可供另一个 Agent 接续的交接文档。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "handoff",
+    "context",
+    "productivity"
+  ],
+  "interface": {
+    "displayName": "Handoff",
+    "shortDescription": "将当前对话压缩为可供另一个 Agent 接续的交接文档。",
+    "longDescription": "用于在切换会话或窗口前生成精简、脱敏并引用既有产物的交接文档。",
+    "developerName": "Skills Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "将当前对话整理为下一会话可以直接接续的 handoff 文档。"
+  },
+  "license": "MIT"
+}
