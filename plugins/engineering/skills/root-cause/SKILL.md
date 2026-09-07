@@ -1,6 +1,6 @@
 ---
 name: root-cause
-description: 当 issue、Bug、测试失败、生产异常、数据污染或非预期行为的原因尚不明确，需要基于代码、日志、trace、历史和可控实验定位因果机制时使用。输出证据化的根因报告与置信度；不实施修复、不修改需求、不调用其他 skills。
+description: 当故障、测试失败或非预期行为的原因尚不明确时使用；基于证据定位因果机制并报告置信度，不实施修复。
 ---
 
 # 根因诊断
@@ -71,54 +71,15 @@ description: 当 issue、Bug、测试失败、生产异常、数据污染或非�
 
 按问题形态选择一种或组合多种方法，不使用固定层数、组件数或假设数量作为门禁。
 
-### Hypothesis-driven
+| 问题形态 | 方法 |
+|---|---|
+| 已有合理候选原因 | Hypothesis-driven：选择能区分解释的最小实验 |
+| 存在正常与异常对照 | Comparative diagnosis：比较差异并验证因果 |
+| 跨边界异常且日志不足 | Boundary instrumentation：定位首次异常边界 |
+| 错误状态来源不明 | Backward tracing：沿数据流追踪首次错误 |
+| 与近期变化或特定输入有关 | Bisection and history：用历史或二分缩小范围 |
 
-已有一个或多个合理候选原因时：
-
-1. 根据现有代码和证据形成候选解释。
-2. 选择能最大程度区分候选原因的最小检查或实验。
-3. 记录证实、削弱或排除该假设的证据。
-4. 根据新证据更新候选集合。
-
-不要为了满足模板凑假设。一个强假设可以直接验证；没有合理假设时先收集更多上下文。
-
-### Comparative diagnosis
-
-存在正常对照时，比较：
-
-- 正常请求与失败请求；
-- 正常用户与异常用户；
-- 本地与 CI；
-- 旧版本与新版本；
-- 成功路径与失败路径；
-- 相似但正常工作的实现。
-
-差异用于缩小范围，不能未经验证直接视为根因。
-
-### Boundary instrumentation
-
-知道系统跨越多个边界但不知道断裂位置，且现有日志不足时：
-
-1. 在关键边界观察输入、输出、配置和环境。
-2. 执行一次最小复现或代表性请求。
-3. 找到最后一个正常边界和第一个异常边界。
-4. 在缩小后的范围内继续形成和验证假设。
-
-### Backward tracing
-
-错误值、状态或路径的来源不明时：
-
-1. 从症状和直接错误位置开始。
-2. 找到直接导致错误的状态或操作。
-3. 沿调用链和数据流向上追踪调用者与赋值点。
-4. 定位错误状态第一次产生的位置。
-5. 验证该位置能解释完整症状和触发条件。
-
-不要在症状处增加兜底后就停止追踪。
-
-### Bisection and history
-
-问题与近期变化或特定输入有关时，使用 git history、blame、bisect、依赖锁文件、配置差异或测试二分缩小引入范围。
+需要所选方法的具体步骤时，读取 [诊断方法](references/diagnostic-methods.md) 中对应章节，不默认加载全部方法。
 
 ## 证据来源
 
@@ -173,67 +134,9 @@ description: 当 issue、Bug、测试失败、生产异常、数据污染或非�
 
 ## 输出
 
-```markdown
-## Root Cause Report
+最小报告包含：验证对象与环境、预期与实际症状、可复核证据、因果链、根因位置与机制、置信度和未解决的不确定性，以及临时变更是否清理。描述需要恢复的不变量，不输出具体修复方案。
 
-### Target
-
-- Issue：
-- Candidate / Build / Environment：
-
-### Symptom
-
-- Expected：
-- Actual：
-- Reproduction：
-- Stability：
-- Impact：
-- First observed：
-
-### Evidence
-
-- ...
-
-### Diagnostic Method
-
-- ...
-
-### Causal Chain
-
-触发条件
-→ 缺陷状态
-→ 失败机制
-→ 可观察症状
-
-### Root Cause
-
-- Location：
-- Mechanism：
-- Category：code / config / data / dependency / environment / external / requirement
-- Confidence：CONFIRMED / PROBABLE / INCONCLUSIVE
-
-### Ruled-out Alternatives
-
-- 仅列真正验证过的重要替代解释及其排除证据。
-
-### Detection Gap
-
-- 为什么现有测试、监控或约束没有发现该问题。
-
-### Reproduction Artifact
-
-- 命令、临时脚本、输入或步骤：
-
-### Invariant to Restore
-
-- 描述必须重新成立的行为或系统不变量，不描述具体修复方案。
-
-### Temporary Instrumentation
-
-- Added：
-- Removed：
-- Workspace restored：yes / no
-```
+需要完整、结构化报告时，读取 [报告模板](references/report-template.md)；普通诊断不要求套用完整模板。
 
 输出可以直接呈现在对话中；只有用户要求持久化时才写入文件。
 
@@ -249,15 +152,17 @@ description: 当 issue、Bug、测试失败、生产异常、数据污染或非�
 
 ## 边界
 
+以下限制适用于本 skill 的诊断职责，不限制外层执行者继续用户已授权的其他阶段。
+
 不要：
 
 - 修改生产逻辑或实施修复；
 - 编写或保留持久回归测试；
 - 修改需求、spec、Plan 或验收标准；
 - 输出具体修复方案；
-- 调用其他 skill；
+- 自动调用或要求其他 skill；
 - commit、push、创建或更新 Pull Request；
 - 因为调查耗时而把第一个可疑点宣布为根因；
 - 把无法复现、环境阻塞或多个解释并存包装成确定结论。
 
-只返回证据化诊断结果，由调用者决定下一步。
+返回证据化诊断结果。本 skill 的职责到此结束，不自动启动或要求后续流程。用户已授权复合任务时，外层执行者继续剩余工作；用户仅要求本阶段时，交付结果后结束任务。
