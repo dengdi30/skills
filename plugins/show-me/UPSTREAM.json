@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/humanlayer/skills",
+  "path": "plugins/show-me/skills/show-me",
+  "commit": "3c2629142c5d437428269b1b722b08c0b87f574d",
+  "license": "MIT",
+  "license_file": "third-party/licenses/show-me-MIT.txt",
+  "imported_at": "2026-09-15",
+  "local_modifications": false
+}

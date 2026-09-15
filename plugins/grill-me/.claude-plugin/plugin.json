@@ -1,0 +1,10 @@
+{
+  "name": "grill-me",
+  "version": "1.0.0",
+  "description": "通过分轮访谈审视计划、设计或想法，澄清决策并达成共识。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "license": "MIT"
+}

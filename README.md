@@ -4,7 +4,7 @@
 
 ## 设计原则
 
-- **独立**：每个 skill 都可以单独使用，不依赖其他 skill 才能成立。
+- **独立**：第一方 skill 都可以单独使用；第三方 skill 保留上游依赖，并随插件一并提供必需依赖。
 - **可组合**：skill 通过计划、代码差异、测试证据、审查报告等通用产物协作，而不是相互硬编码调用。
 - **按需使用**：任务需要什么就使用什么，不为流程完整而调用无价值的步骤。
 - **证据优先**：计划写清可验收结果，实现强调有价值的测试，诊断追求根因证据，审查与验证给出可复核结论。
@@ -22,7 +22,9 @@
 ├── plugins/                         # 生成的 Codex / Claude Code 插件
 │   ├── engineering/
 │   ├── baoyu-design/
-│   └── handoff/
+│   ├── handoff/
+│   ├── grill-me/
+│   └── show-me/
 ├── scripts/build_distribution.py
 ├── skills/
 │   ├── engineering/
@@ -37,6 +39,12 @@
     ├── baoyu-design.upstream.json
     ├── handoff/
     ├── handoff.upstream.json
+    ├── grill-me/
+    ├── grill-me.upstream.json
+    ├── grilling/
+    ├── grilling.upstream.json
+    ├── show-me/
+    ├── show-me.upstream.json
     └── licenses/
 ```
 
@@ -76,17 +84,43 @@
 
 更新时应重新固定明确的上游 commit、核对目录内容，并同步来源与许可证记录。
 
+### grill-me 与 grilling
+
+[grill-me](third-party/grill-me/SKILL.md) 和 [grilling](third-party/grilling/SKILL.md) 由 Matt Pocock 维护，上游仓库为 [`mattpocock/skills`](https://github.com/mattpocock/skills)。`grill-me` 是用户显式调用的入口，委托 `grilling` 执行访谈。`grilling` 沿设计决策树分轮提问，每轮只询问前置条件已明确的问题，并给出建议答案；能从环境查明的事实交给 subagent 查证，决策由用户回答。
+
+两个 skill 均保持上游原样，固定为引入时最新主分支 commit `3cca18b368ae95cdbdebbff572ccafa662551015`，作为同一个 `grill-me` 插件分发：
+
+- `grill-me`：[来源与版本记录](third-party/grill-me.upstream.json)、[MIT 许可证](third-party/licenses/grill-me-MIT.txt)
+- `grilling`：[来源与版本记录](third-party/grilling.upstream.json)、[MIT 许可证](third-party/licenses/grilling-MIT.txt)
+
+单独复制 `grill-me` 无法提供完整访谈能力，需同时提供 `grilling`。二者不承担 ADR 或领域术语表维护；与其他 skill 的组合由用户决定。
+
+更新时应将两个 skill 固定到同一明确的上游 commit、核对完整目录，并同步各自的来源与许可证记录。插件的 `UPSTREAM.json` 汇总两份记录，各 TRAE skill ZIP 则携带自己的 `UPSTREAM.json`。
+
+### show-me
+
+[show-me](third-party/show-me/SKILL.md) 由 HumanLayer 维护，上游仓库为 [`humanlayer/skills`](https://github.com/humanlayer/skills)。该 skill 用简洁图示、代码结构草图和聚焦的 HTML 产物解释当前话题，根据问题选择伪代码、调用树、组件树、文件树、差异或 Mermaid 图。
+
+仓库中的副本保持上游原样，引入版本固定为 commit `3c2629142c5d437428269b1b722b08c0b87f574d`：
+
+- [来源与版本记录](third-party/show-me.upstream.json)
+- [MIT 许可证](third-party/licenses/show-me-MIT.txt)
+
+更新时应重新固定明确的上游 commit、核对目录内容，并同步来源与许可证记录。
+
 ## Marketplace
 
-仓库提供三个彼此独立的插件：
+仓库提供五个彼此独立的插件：
 
 | Plugin | 内容 | 安装策略 |
 | --- | --- | --- |
 | `engineering` | `write-plan`、`tdd-implement`、`root-cause`、`review`、`verify` | Codex、Claude Code 均显式安装 |
 | `baoyu-design` | vendored 的 `baoyu-design` skill | 始终显式安装 |
 | `handoff` | vendored 的 `handoff` skill | 始终显式安装 |
+| `grill-me` | vendored 的 `grill-me` 入口与 `grilling` 访谈规则 | 始终显式安装 |
+| `show-me` | vendored 的 `show-me` skill | 始终显式安装 |
 
-添加 marketplace 只注册可用插件，不会自动安装或启用 `engineering`、`baoyu-design`、`handoff`。
+添加 marketplace 只注册可用插件，不会自动安装或启用任何插件。
 
 ### Codex
 
@@ -100,9 +134,11 @@ codex plugin add engineering@skills
 ```sh
 codex plugin add baoyu-design@skills
 codex plugin add handoff@skills
+codex plugin add grill-me@skills
+codex plugin add show-me@skills
 ```
 
-也可以在 Codex CLI 中运行 `/plugins`，或在 Codex app 的 Plugins 页面中打开 `Skills` marketplace，再手动安装 `engineering`。`baoyu-design` 和 `handoff` 保持可选。安装后新建会话，再通过 skill 选择器或任务描述使用对应能力。
+也可以在 Codex CLI 中运行 `/plugins`，或在 Codex app 的 Plugins 页面中打开 `Skills` marketplace，再手动安装需要的插件。所有第三方插件保持可选。安装后新建会话，再通过 skill 选择器或任务描述使用对应能力。
 
 Codex IDE extension 当前不支持 plugins；需要在 IDE extension 中使用时，仍应把所需 skill 安装到项目的 `.agents/skills/`。
 
@@ -118,22 +154,28 @@ claude plugin install engineering@skills
 ```sh
 claude plugin install baoyu-design@skills
 claude plugin install handoff@skills
+claude plugin install grill-me@skills
+claude plugin install show-me@skills
 ```
 
-Claude Code 中的插件 skill 使用命名空间，例如 `/engineering:review`、`/baoyu-design:baoyu-design` 和 `/handoff:handoff`。
+Claude Code 中的插件 skill 使用命名空间，例如 `/engineering:review`、`/baoyu-design:baoyu-design`、`/handoff:handoff`、`/grill-me:grill-me` 和 `/show-me:show-me`。
 
 ### TRAE 企业版
 
-从仓库的 [Releases](https://github.com/dengdi30/skills/releases) 下载对应版本的 TRAE 附件。`v1.0.0` 提供：
+从仓库的 [v1.1.0 Release](https://github.com/dengdi30/skills/releases/tag/v1.1.0) 下载对应的 TRAE 附件。Release 版本标识整套分发，各插件保留自己的版本号：
 
 ```text
-engineering-1.0.0.zip
+engineering-1.1.0.zip
 baoyu-design-1.0.0.zip
 handoff-1.0.0.zip
+grill-me-1.0.0.zip
+show-me-1.0.0.zip
 SHA256SUMS
 ```
 
-`engineering-1.0.0.zip` 是交付 bundle，需要先解压，再将其中五个独立 skill ZIP 分别上传到 TRAE 企业技能。`baoyu-design-1.0.0.zip` 和 `handoff-1.0.0.zip` 都可以直接上传，并包含各自的许可证和固定上游版本记录。可使用 `SHA256SUMS` 校验下载文件的完整性。
+`engineering-1.1.0.zip` 是交付 bundle，需要先解压，再将其中五个独立 skill ZIP 分别上传到 TRAE 企业技能。`grill-me-1.0.0.zip` 也是 bundle，需先解压，再将其中的 `grill-me.zip` 与 `grilling.zip` 同时上传。`baoyu-design-1.0.0.zip`、`handoff-1.0.0.zip` 和 `show-me-1.0.0.zip` 可直接上传。
+
+各第三方 skill ZIP 均包含许可证和固定上游版本记录。可使用 `SHA256SUMS` 校验下载文件的完整性；在本地运行 `python3 scripts/build_distribution.py` 可重新生成 `dist/trae/` 中的分发包。
 
 不要发布或自动加载 `skills/deprecated/`。
 

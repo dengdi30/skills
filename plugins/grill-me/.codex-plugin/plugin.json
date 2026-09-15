@@ -1,0 +1,24 @@
+{
+  "name": "grill-me",
+  "version": "1.0.0",
+  "description": "通过分轮访谈审视计划、设计或想法，澄清决策并达成共识。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "planning",
+    "design",
+    "interview"
+  ],
+  "interface": {
+    "displayName": "Grill Me",
+    "shortDescription": "通过分轮访谈审视计划、设计或想法，澄清决策并达成共识。",
+    "longDescription": "包含 grill-me 用户入口和 grilling 访谈规则；每轮询问前置条件已明确的问题、给出建议答案，并根据回答推进后续决策。",
+    "developerName": "Skills Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "使用 grill-me 和随附的 grilling，分轮审视当前计划或设计，并给出建议答案。"
+  },
+  "license": "MIT"
+}

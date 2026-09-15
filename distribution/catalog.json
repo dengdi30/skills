@@ -11,7 +11,7 @@
       "display_name": "engineering",
       "description": "覆盖计划、实现、诊断、审查和验证的工程开发技能。",
       "long_description": "提供编写计划、TDD 实现、根因诊断、独立代码审查和动态验证等工程开发能力。",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source_kind": "maintained",
       "default_install": false,
       "category": "Developer Tools",
@@ -72,6 +72,54 @@
       "provenance_file": "third-party/handoff.upstream.json",
       "skills": [
         "third-party/handoff"
+      ]
+    },
+    {
+      "id": "grill-me",
+      "display_name": "Grill Me",
+      "description": "通过分轮访谈审视计划、设计或想法，澄清决策并达成共识。",
+      "long_description": "包含 grill-me 用户入口和 grilling 访谈规则；每轮询问前置条件已明确的问题、给出建议答案，并根据回答推进后续决策。",
+      "version": "1.0.0",
+      "source_kind": "vendored",
+      "default_install": false,
+      "category": "Developer Tools",
+      "default_prompt": "使用 grill-me 和随附的 grilling，分轮审视当前计划或设计，并给出建议答案。",
+      "tags": [
+        "planning",
+        "design",
+        "interview"
+      ],
+      "license": "MIT",
+      "license_file": "third-party/licenses/grill-me-MIT.txt",
+      "provenance_files": {
+        "grill-me": "third-party/grill-me.upstream.json",
+        "grilling": "third-party/grilling.upstream.json"
+      },
+      "skills": [
+        "third-party/grill-me",
+        "third-party/grilling"
+      ]
+    },
+    {
+      "id": "show-me",
+      "display_name": "Show Me",
+      "description": "用简洁图示、代码结构草图和 HTML 产物解释当前话题。",
+      "long_description": "根据当前问题选择伪代码、调用树、组件树、文件树、差异、Mermaid 图或聚焦的 HTML 产物，帮助理解关键逻辑与结构。",
+      "version": "1.0.0",
+      "source_kind": "vendored",
+      "default_install": false,
+      "category": "Developer Tools",
+      "default_prompt": "使用 show-me，以合适的图示或结构草图解释当前话题。",
+      "tags": [
+        "visualization",
+        "explanation",
+        "diagrams"
+      ],
+      "license": "MIT",
+      "license_file": "third-party/licenses/show-me-MIT.txt",
+      "provenance_file": "third-party/show-me.upstream.json",
+      "skills": [
+        "third-party/show-me"
       ]
     }
   ]

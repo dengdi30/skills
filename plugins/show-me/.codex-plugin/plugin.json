@@ -1,0 +1,24 @@
+{
+  "name": "show-me",
+  "version": "1.0.0",
+  "description": "用简洁图示、代码结构草图和 HTML 产物解释当前话题。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "keywords": [
+    "visualization",
+    "explanation",
+    "diagrams"
+  ],
+  "interface": {
+    "displayName": "Show Me",
+    "shortDescription": "用简洁图示、代码结构草图和 HTML 产物解释当前话题。",
+    "longDescription": "根据当前问题选择伪代码、调用树、组件树、文件树、差异、Mermaid 图或聚焦的 HTML 产物，帮助理解关键逻辑与结构。",
+    "developerName": "Skills Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "使用 show-me，以合适的图示或结构草图解释当前话题。"
+  },
+  "license": "MIT"
+}

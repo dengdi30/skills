@@ -252,7 +252,7 @@ def build_trae_release_package(
     readme = (
         f"# {display_name} TRAE 上传包\n\n"
         f"版本：{plugin['version']}\n\n"
-        "此文件是多个独立 TRAE skills 的交付 bundle，不能直接作为单个 skill 上传。"
+        "此文件是多个 TRAE skills 的交付 bundle，不能直接作为单个 skill 上传。"
         "请先解压，再将其中的每个 ZIP 分别上传到 TRAE 企业技能。\n\n"
         "包含：\n\n"
         + "".join(f"- `{name}.zip`\n" for name in skill_names)
@@ -310,6 +310,14 @@ def build(check: bool) -> None:
             extras["LICENSE.txt"] = repo_path(plugin["license_file"])
         if plugin.get("provenance_file"):
             extras["UPSTREAM.json"] = repo_path(plugin["provenance_file"])
+        provenance_files = {
+            name: repo_path(raw_path)
+            for name, raw_path in plugin.get("provenance_files", {}).items()
+        }
+        if provenance_files and plugin.get("provenance_file"):
+            raise DistributionError(
+                f"Plugin {plugin_id} cannot use both provenance_file and provenance_files"
+            )
 
         for archive_name, source in extras.items():
             ensure_file(plugin_root / archive_name, source.read_bytes(), check)
@@ -322,7 +330,26 @@ def build(check: bool) -> None:
                 raise DistributionError(f"Duplicate active skill name: {name}")
             seen_skills.add(name)
             sync_tree(source, skill_root / name, check)
-            plugin_skill_archives[name] = build_skill_zip(source, extras)
+            skill_extras = dict(extras)
+            if name in provenance_files:
+                skill_extras["UPSTREAM.json"] = provenance_files[name]
+            plugin_skill_archives[name] = build_skill_zip(source, skill_extras)
+
+        if provenance_files:
+            if set(provenance_files) != set(plugin_skill_archives):
+                raise DistributionError(
+                    f"Plugin {plugin_id} provenance_files must cover exactly its skills"
+                )
+            ensure_file(
+                plugin_root / "UPSTREAM.json",
+                json_bytes({
+                    "skills": {
+                        name: json.loads(path.read_text(encoding="utf-8"))
+                        for name, path in provenance_files.items()
+                    }
+                }),
+                check,
+            )
 
         release_name = f"{plugin_id}-{plugin['version']}.zip"
         trae_packages[release_name] = build_trae_release_package(

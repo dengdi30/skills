@@ -1,0 +1,10 @@
+{
+  "name": "show-me",
+  "version": "1.0.0",
+  "description": "用简洁图示、代码结构草图和 HTML 产物解释当前话题。",
+  "author": {
+    "name": "Skills Maintainers"
+  },
+  "skills": "./skills/",
+  "license": "MIT"
+}
