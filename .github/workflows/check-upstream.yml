@@ -1,0 +1,53 @@
+name: Check upstream skills
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      verify_model:
+        description: 'Also make a short, billed OpenRouter request to verify model access'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: check-upstream-skills
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+
+      - name: Run regression tests
+        run: python3 -m unittest discover -s tests
+
+      - name: Check upstream and notify
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          UPSTREAM_UPDATES_ISSUE_NUMBER: ${{ vars.UPSTREAM_UPDATES_ISSUE_NUMBER }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          VERIFY_MODEL: ${{ inputs.verify_model }}
+        shell: bash
+        run: |
+          args=(--publish)
+          if [[ "$VERIFY_MODEL" == 'true' ]]; then
+            args+=(--verify-model)
+          fi
+          python3 scripts/check_upstream.py "${args[@]}"
