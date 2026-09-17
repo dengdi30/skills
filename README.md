@@ -108,25 +108,6 @@
 
 更新时应重新固定明确的上游 commit、核对目录内容，并同步来源与许可证记录。
 
-### 上游更新提醒
-
-[Check upstream skills](.github/workflows/check-upstream.yml) 每周一北京时间 10:00 检查第三方技能，也可在 GitHub 的 Actions 页面手动运行。它以远程 `main` 的来源记录为基准，只比较已引入目录、登记的依赖和许可证；`grill-me` 与 `grilling` 成组检查。新候选和检查失败汇总到固定 Issue，同一候选只提醒一次。
-
-固定通知入口为 [第三方 Skills 上游更新通知 #3](https://github.com/dengdi30/skills/issues/3)。在仓库 Settings → Secrets and variables → Actions 配置：
-
-- Secret `OPENROUTER_API_KEY`：用于生成中文变化摘要。
-- Variable `UPSTREAM_UPDATES_ISSUE_NUMBER`：固定 Issue 的编号，本仓库为 `3`。
-
-在该 Issue 点击 **Subscribe**，按个人 GitHub 通知设置接收站内或邮件提醒。首次手动运行可勾选 `verify_model`，用一个短样例验证 OpenRouter 调用；这会产生少量费用。自动检查只提供候选，你试用后再决定是否创建更新 PR 和合入。
-
-本地预览需要 Python 3.10+、Git 和外网访问；读取 Issue 去重记录还需要 `GITHUB_TOKEN` 及上述 Issue 编号：
-
-```sh
-python3 scripts/check_upstream.py --dry-run
-```
-
-预览默认不调用模型、不发评论；配置 `OPENROUTER_API_KEY` 并加上 `--summarize` 可预览付费摘要。上游分支、许可证、额外依赖及模型限制集中在 [upstream-monitor.json](third-party/upstream-monitor.json)。
-
 ## Marketplace
 
 仓库提供五个彼此独立的插件：
