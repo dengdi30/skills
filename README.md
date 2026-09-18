@@ -55,7 +55,7 @@
 | [write-plan](skills/engineering/write-plan/SKILL.md) | 将需求整理为可执行计划，包括目标、范围与约束、实现方向、可选技术方案、验收标准、可选 Tasks，以及测试与验收方式 | 实现代码、执行验证或审查 |
 | [tdd-implement](skills/engineering/tdd-implement/SKILL.md) | 根据当前任务实现代码，并在高价值场景执行 test-first；测试强度由风险决定 | 需求规划、独立审查或最终验收 |
 | [root-cause](skills/engineering/root-cause/SKILL.md) | 基于证据定位问题根因，区分现象、触发条件与根本原因 | 修改代码或代替修复决策 |
-| [review](skills/engineering/review/SKILL.md) | 由上下文干净的 subagent 对当前工作区差异进行独立、对抗性审查 | 修改代码、给出修复实现或执行动态验收 |
+| [review](skills/engineering/review/SKILL.md) | 由上下文干净的 subagent 分别提供需求符合性、正确性与回归的审查意见 | 修改代码、替用户决定修复取舍或执行动态验收 |
 | [verify](skills/engineering/verify/SKILL.md) | 通过集成测试、E2E、自动化操作或 Playwright CLI 等方式验证结果是否符合预期 | 实现功能或把一次性验收自动转化为永久回归测试 |
 
 每个 skill 的完整规则与边界以对应的 `SKILL.md` 为准。
